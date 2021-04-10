@@ -40,7 +40,6 @@ class FaceRekognition:
         
         threshold = self.__dataModel["config"]["threshold"]
         faceCount = len(response["FaceDetails"])
-        faceList = []
         imageList = []
         memeberCounter = 0
         sumSimilarity = 0
