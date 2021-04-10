@@ -27,10 +27,12 @@ class FaceRekognition:
     def rekognizeFace(self):
         if self.__dataModel["config"]["rekognize"]["mode"] == "0": #註冊模式
             if self.__dataModel["config"]["rekognize"]["register"] == True: #source端當按下按鈕(register變成True)才進行註冊
+                self._storeSourceImage() #_只能由class內部呼叫
                 self._registeredFace() #_只能由class內部呼叫
             else:
                 return "ignore"
         elif self.__dataModel["config"]["rekognize"]["mode"] == "1": #簽到模式
+            self._storeSourceImage() #_只能由class內部呼叫
             self._signInFace()
     def _registeredFace(self):
         binaryImage = base64.b64decode(self.__dataModel["frame"]["openCV"]["imageBase64"])
@@ -277,7 +279,7 @@ class FaceRekognition:
             faceImageUrlList.append('https://' + self.__faceBucketName + '.s3-' + self.__region_name + '.amazonaws.com/' + fileName)
             serialNo += 1
         return faceImageUrlList
-    def storeSourceImage(self):
+    def _storeSourceImage(self):
         image = self.__dataModel["frame"]["openCV"]["imageBase64"]
         image = base64.b64decode(image)
         fileName = self.__dataModel["frame"]["captureResult"]["id"]
