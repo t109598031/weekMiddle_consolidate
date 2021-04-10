@@ -17,6 +17,5 @@ def lambda_handler(event, context):
                                       config.memberFaceListBucketName,
                                       config.memberFaceFileName)
     faceRekognition.rekognizeFace()
-    faceRekognition.storeSourceImage()
     
     return faceRekognition.getModel()
