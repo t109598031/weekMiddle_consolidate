@@ -1,2 +1,0 @@
-receiverLineId = 'Udcb23b3f3d516507c049608cc3b08a7c'
-channelAccessToken = 'ALeKRpQrAok3Txy6EJJpBK2WicU8PvI3bUCBXLP0a5cGkuT3SSRRj9qQ+wYth/9Yns9udkaP7EHlGlkWSLPmpRNI1U5TMDzV8JM//LHoubTz+ynMqBkUkeO7QatuaLHHT84/o/t8+MWyku097+e5SAdB04t89/1O/w1cDnyilFU='
