@@ -13,7 +13,6 @@ from API.captureAPI import Capture
 frame = None
 
 client = boto3.client('stepfunctions', aws_access_key_id=awsconfig.access_key, aws_secret_access_key=awsconfig.secret_access_key,region_name= awsconfig.region_name)
-client2 = boto3.client('s3', aws_access_key_id=awsconfig.access_key, aws_secret_access_key=awsconfig.secret_access_key,region_name= awsconfig.region_name)
 
 def stream():
 
@@ -72,11 +71,7 @@ def main():
             model  = Capture().Frame(frame)
 
 
-            #if time.time() - begin > config.stepFunctionActivateFreqency
-            image_binary = base64.b64decode(model["image"])
-            #client2.put_object(ACL='public-read',Body=image_binary, Bucket=config.config["s3Bucket"], Key = model["id"] ,ContentEncoding='base64',ContentType='image/jpeg')
-            #url = 'https://' + config.config["s3Bucket"] + '.s3-' + 'us-west-2' + '.amazonaws.com/' + model["id"]
-            #print(url)
+
             model["config"] = config.config
             #print(model)
 
