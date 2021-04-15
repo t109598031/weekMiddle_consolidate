@@ -116,7 +116,7 @@ class ObjDetection:
         client.put_object(ACL='public-read',Body=image, Bucket=bucketName, Key=fileName ,ContentEncoding='base64',ContentType='image/jpeg')
         self.__dataModel["objectDetection"]["s3"] = {}
         self.__dataModel["objectDetection"]["s3"]["sourceImageUrl"] = 'https://' + bucketName + '.s3-' + self.__region_name + '.amazonaws.com/' + fileName
-    '''def modifyDataModel(self):
+    def modifyDataModel(self):
         dataModel = self.__dataModel
         newObjectList = []
         for obj in dataModel["objectDetection"]["detectionResult"]["objectList"]:
@@ -128,7 +128,7 @@ class ObjDetection:
                 newDataModel["confidence"] = obj["confidence"][i]
                 newDataModel["objectImageUrl"] = obj["objectImageUrl"][i]
                 newObjectList.append(newDataModel)
-        self.__dataModel["objectDetection"]["detectionResult"]["objectList"] = newObjectList'''
+        self.__dataModel["objectDetection"]["detectionResult"]["objectList"] = newObjectList
     def getModel(self):
         self.__dataModel["frame"]["openCV"]["imageBase64"] = ""
         
