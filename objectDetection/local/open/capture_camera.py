@@ -25,14 +25,13 @@ def stream():
         try:
             if videoSource.isOpened():
                 ret, frame = videoSource.read()
-                out.write(frame)
                 Height , Width = frame.shape[:2]
                 scale = None
                 if Height/640 > Width/960:
                     scale = Height/640
                 else:
                     scale = Width/960
-                frame = cv2.resize(frame, (int(Width/scale), int(Height/scale)), interpolation=cv2.INTER_CUBIC)
+                frame = cv2.resize(frame.copy(), (int(Width/scale), int(Height/scale)), interpolation=cv2.INTER_CUBIC)
                 #image = cv2.line(frame.copy(), (640, 0), (640, 720), (0, 0, 255), 5)
                 #out.write(frame)
                 cv2.imshow("CSI",frame)
