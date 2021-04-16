@@ -12,4 +12,3 @@ config = {
     "alertNotifyActivation":True,
     "initObject":True
 }
-stepFunctionActivateFreqency = 1
