@@ -8,7 +8,6 @@ import base64
 import awsconfig
 import config
 from API.captureAPI import Capture
-#from API.recogntion import Recognition
 
 frame = None
 
@@ -32,8 +31,6 @@ def stream():
                 else:
                     scale = Width/960
                 frame = cv2.resize(frame.copy(), (int(Width/scale), int(Height/scale)), interpolation=cv2.INTER_CUBIC)
-                #image = cv2.line(frame.copy(), (640, 0), (640, 720), (0, 0, 255), 5)
-                #out.write(frame)
                 cv2.imshow("CSI",frame)
                 cv2.waitKey(1)
                 if ret == False:
@@ -51,12 +48,11 @@ def main():
 
     global frame
 
-    personCount = None
-    model = None 
+    model = {} 
 
     while True:
 
-        time.sleep(config.stepFunctionActivateFreqency)
+        time.sleep(config.config["stepFunctionActivateFreqency"])
 
         if frame is not None:
 
@@ -65,19 +61,19 @@ def main():
             print("Streaming........")
             
 
-            #if Recognition().YoloV4(frame) > 0:
 
-            model  = Capture().Frame(frame)
-
-
+            model['frame']  = Capture().Frame(frame)
 
             model["config"] = config.config
+
             #print(model)
 
             response = client.start_execution(
                stateMachineArn = awsconfig.stepfunction_ARN,
                input = json.dumps(model)
             )
+
+            model["config"]['initObject'] = False
 
 
 if __name__ == '__main__':
