@@ -122,8 +122,9 @@ class FaceSearch:
         self.__dataModel["signInResult"] = {}
         self.__dataModel["signInResult"]["personList"] = []
         self.__dataModel["frame"]["personList"] = []
+        self.__dataModel["frame"]["sourceImage"] = {}
         self.__dataModel["frame"]["sourceImage"]["personCount"] = personCounter
-
+        self.__memberFaceList = self.__s3.readJson(self.__memberFaceFileName)
         if len(faceDetectResponse["FaceDetails"]) >= 1: #複數人臉
             for face in faceDetectResponse["FaceDetails"]:
                 faceBoundingBoxList.append(face["BoundingBox"])
@@ -131,7 +132,7 @@ class FaceSearch:
             faceImageList = self.spliteImage(faceBoundingBoxList) #切割
             for image in faceImageList:
                 fileName = 'face' + str(self.__dataModel["frame"]["captureResult"]["timestamp"]) + str(serialNo) + '.jpg'
-                faceImageUrlList = self.__s3.storeFaceImage(image,fileName)
+                faceImageUrlList = self.__s3.storeImage(image,fileName)
                 serialNo += 1
             serialNo = 0
             ##############################
@@ -144,21 +145,28 @@ class FaceSearch:
                 matchedImageCounter = len(searchFaceResponse["FaceMatches"]) #重新判斷
                 registrationImageList = [] #清空
                 if len(searchFaceResponse["FaceMatches"]) != 0:
-                    memberFaceListResponse = self.__s3.listobjects(searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"])
+                    memberFaceListResponse = self.__s3.listObjects(searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"])
                     for face in memberFaceListResponse["Contents"]: #成員所有已註冊的人臉數
-                        uid,faceImageId = face["Key"].split('_')[0],face["Key"].split('_')[1]
-                        uid = uid.split('/')[1]
-                        if uid == searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"]: #根據對應的成員id將對應成員的人臉加入list
-                            faceImageIdList.append(faceImageId)
+                        try:
+                            uid,faceImageId = face["Key"].split('_')[0],face["Key"].split('_')[1]
+                            #uid = uid.split('/')[1]
+                            if uid == searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"]: #根據對應的成員id將對應成員的人臉加入list
+                                faceImageIdList.append(faceImageId)
+                        except Exception as e:
+                            print(e)
+                            break
                     registrationImageCounter = len(faceImageIdList)
                     sumSimilarity = 0 #重新計算
+                    print(faceImageIdList)
+                    print(searchFaceResponse["FaceMatches"])
                     for face in searchFaceResponse["FaceMatches"]: #成員與簽到人臉匹配(條件)
                         if face["Similarity"] > 70 and face["Face"]["FaceId"] + '.jpg' in faceImageIdList:
                             registrationModel = {}
-                            faceImageUrl = 'https://' + self.__s3.__bucketName + '.s3-' + self.__s3.__region_name + '.amazonaws.com/' + searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"] + '_' + face["Face"]["FaceId"] + ".jpg"
+                            faceImageUrl = 'https://' + self.__s3.getBucketName() + '.s3-' + self.__s3.getRegionName() + '.amazonaws.com/' + searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"] + '_' + face["Face"]["FaceId"] + ".jpg"
                             faceImageUrlList.append(faceImageUrl)
                             faceIdList.append(face["Face"]["FaceId"])
                             sumSimilarity += face["Similarity"]
+                            timestamp = ""
                             try:
                                 timestamp = next(member for member in self.__memberFaceList["imageData"] if member["faceId"] == face["Face"]["FaceId"])["timestamp"]
                             except StopIteration: #上面的寫法會剛好超出list長度1 所以用try-except去忽略此錯誤
@@ -168,6 +176,7 @@ class FaceSearch:
                             registrationModel["similarity"] = face["Similarity"]
                             registrationModel["timestamp"] = timestamp
                             registrationImageList.append(registrationModel)
+                            print(registrationImageList)
                         """if searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"] not in memberList:
                             memberList.append(searchFaceResponse["FaceMatches"][0]["Face"]["ExternalImageId"])"""
 
@@ -222,7 +231,7 @@ class FaceSearch:
         print(len(imagelist))
         print("cut finish")
         return imagelist
-    def _createFaceData(self,binaryImage,uid):
+    """def _createFaceData(self,binaryImage,uid):
         faceIdList = []
         response=self.__client.index_faces(CollectionId=self.__collectionId,
                                     Image={'Bytes':binaryImage},
@@ -232,7 +241,9 @@ class FaceSearch:
                                     DetectionAttributes=['ALL'])
         for face in response['FaceRecords']:
             faceIdList.append(face['Face']['FaceId'])
-        return faceIdList
+        return faceIdList"""
     def getModel(self):
+        self.__dataModel["frame"]["openCV"]["imageBase64"] = ""
+        print(self.__dataModel)
         return self.__dataModel
 
